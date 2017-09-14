@@ -1,6 +1,7 @@
 package com.demo.jzhangjie.simpleandroidproject.fragment;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -30,6 +31,7 @@ public class AdjustableHeightContainer extends Fragment implements View.OnClickL
     //endregion
 
     // region 其他对象
+    private AdjustableHeightContainerCallback callback;
     private List<Object> mContents = new ArrayList<>();
     private List<String> mKeys = new ArrayList<>();
     private int lastY;
@@ -39,6 +41,8 @@ public class AdjustableHeightContainer extends Fragment implements View.OnClickL
 
     public AdjustableHeightContainer() {
     }
+
+
 
     //region 对外接口方法
     public void close() {
@@ -107,11 +111,29 @@ public class AdjustableHeightContainer extends Fragment implements View.OnClickL
 
     //region 生命周期回调函数
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if(context instanceof AdjustableHeightContainerCallback)
+        {
+            callback = (AdjustableHeightContainerCallback)context;
+        }
+        else {
+            throw new RuntimeException(context.toString());
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mRootView = inflater.inflate(R.layout.fragment_adjustable_height_container, container, false);
         initView();
         return mRootView;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        callback = null;
     }
     //endregion
 
@@ -153,10 +175,15 @@ public class AdjustableHeightContainer extends Fragment implements View.OnClickL
                     if (i == mKeys.size())
                         i = 0;
                     String newkey = mKeys.get(i);
+                    callback.TopButtonClick(key);
                     show(newkey);
                 }
                 break;
         }
     }
     //endregion
+
+    public interface AdjustableHeightContainerCallback{
+        void TopButtonClick(String key);
+    }
 }
